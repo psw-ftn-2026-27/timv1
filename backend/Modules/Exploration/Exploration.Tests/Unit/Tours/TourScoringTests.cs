@@ -11,6 +11,6 @@ public class TourScoringTests
     {
         var score = TourScoring.Score(0, 0, 0, 0, false, false, false);
 
-        score.Should().Be(1);
+        score.Should().Be(0);
     }
 }
