@@ -1,0 +1,30 @@
+<Project>
+
+  <PropertyGroup>
+    <TtAnalyzersDir>$(MSBuildThisFileDirectory)</TtAnalyzersDir>
+    <TtRepoRoot Condition="'$(TtRepoRoot)' == ''">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../..'))</TtRepoRoot>
+    <TtIsAnalyzerProject Condition="$(MSBuildProjectName.StartsWith('TeamTracker.Analyzers'))">true</TtIsAnalyzerProject>
+    <ErrorLog Condition="'$(TtSarifDir)' != '' and '$(TtIsAnalyzerProject)' != 'true'">$(TtSarifDir)$(MSBuildProjectName).sarif,version=2.1</ErrorLog>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TtIsAnalyzerProject)' != 'true'">
+    <ProjectReference Include="$(TtAnalyzersDir)TeamTracker.Analyzers/TeamTracker.Analyzers.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false"
+                      PrivateAssets="all" />
+    <CompilerVisibleProperty Include="TtRepoRoot" />
+    <CompilerVisibleProperty Include="TtMeasure" />
+    <EditorConfigFiles Include="$(TtAnalyzersDir)tt.globalconfig" />
+  </ItemGroup>
+
+  <Target Name="TtRemoveOtherAnalyzers" BeforeTargets="CoreCompile" Condition="'$(TtOnlyOwnRules)' == 'true'">
+    <ItemGroup>
+      <Analyzer Remove="@(Analyzer)"
+                Condition="'%(Filename)' == 'Microsoft.AspNetCore.App.Analyzers'
+                           or '%(Filename)' == 'Microsoft.AspNetCore.Components.Analyzers'
+                           or '%(Filename)' == 'Microsoft.EntityFrameworkCore.Analyzers'
+                           or '%(Filename)' == 'xunit.analyzers'" />
+    </ItemGroup>
+  </Target>
+
+</Project>

@@ -1,0 +1,20 @@
+is_global = true
+
+tt_meloc_suspect = 15
+tt_meloc_critical = 25
+tt_cyclo_suspect = 5
+tt_cyclo_critical = 12
+tt_nop_suspect = 3
+tt_nop_critical = 6
+tt_cloc_suspect = 80
+tt_cloc_critical = 150
+tt_wmc_suspect = 15
+tt_wmc_critical = 25
+tt_nad_suspect = 10
+tt_nad_critical = 15
+tt_nmd_suspect = 12
+tt_nmd_critical = 16
+tt_cbo_suspect = 8
+tt_cbo_critical = 12
+tt_dit_suspect = 3
+tt_dit_critical = 5
