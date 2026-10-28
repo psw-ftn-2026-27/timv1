@@ -1,0 +1,68 @@
+name: maintainability
+
+# Meri lakoću održavanja celog repoa (naš analizator TT001–TT009) na predaji revizije i na merge-u.
+# Rezultat: commit status "maintainability" (za TeamTracker) i artefakt "maintainability-report" (za procenu revizije).
+
+on:
+  pull_request_review:
+    types: [submitted]
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+  statuses: write
+
+env:
+  SCRIPTS: _ci/.github/scripts
+
+jobs:
+  maintainability:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    if: >-
+      github.event.pull_request.base.ref != 'main'
+      && ((github.event_name == 'pull_request_review'
+       && github.event.review.user.login != github.event.pull_request.user.login
+       && github.event.review.user.type != 'Bot')
+      || (github.event_name == 'pull_request' && github.event.pull_request.merged == true))
+
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Checkout CI scripts
+        uses: actions/checkout@v4
+        with:
+          path: _ci
+          sparse-checkout: /.github/
+          sparse-checkout-cone-mode: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Compute maintainability metrics
+        id: metrics
+        run: bash "$SCRIPTS/maintainability/measure.sh"
+
+      - name: Upload maintainability report
+        uses: actions/upload-artifact@v4
+        with:
+          name: maintainability-report
+          path: maintainability-report.json
+          if-no-files-found: error
+
+      - name: Publish maintainability as commit status
+        if: ${{ !cancelled() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          METRICS: ${{ steps.metrics.outputs.result }}
+        run: bash "$SCRIPTS/maintainability/publish_status.sh"

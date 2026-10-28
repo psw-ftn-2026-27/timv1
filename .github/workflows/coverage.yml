@@ -1,0 +1,84 @@
+name: coverage
+
+# Meri pokrivenost celog repoa na predaji revizije (stanje „pre revizije") i na merge-u („posle revizije").
+# Rezultat: commit status "coverage" (za TeamTracker) i artefakt "coverage-report" (Cobertura, za procenu revizije).
+
+on:
+  pull_request_review:
+    types: [submitted]
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+  statuses: write
+
+env:
+  SCRIPTS: _ci/.github/scripts
+
+jobs:
+  coverage:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    if: >-
+      github.event.pull_request.base.ref != 'main'
+      && ((github.event_name == 'pull_request_review'
+       && github.event.review.user.login != github.event.pull_request.user.login
+       && github.event.review.user.type != 'Bot')
+      || (github.event_name == 'pull_request' && github.event.pull_request.merged == true))
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: admin
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Checkout CI scripts
+        uses: actions/checkout@v4
+        with:
+          path: _ci
+          sparse-checkout: /.github/
+          sparse-checkout-cone-mode: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Test with coverage
+        continue-on-error: true
+        run: bash "$SCRIPTS/coverage/test_with_coverage.sh"
+
+      - name: Aggregate coverage report
+        run: bash "$SCRIPTS/common/aggregate_coverage.sh" coverage-raw coverage-summary "JsonSummary;Cobertura"
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-summary/Cobertura.xml
+          if-no-files-found: error
+
+      - name: Publish coverage as commit status
+        if: ${{ !cancelled() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: bash "$SCRIPTS/coverage/publish_status.sh"
