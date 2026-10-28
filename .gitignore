@@ -9,6 +9,7 @@ node_modules/
 dist/
 .angular/
 coverage/
+!.github/scripts/coverage/
 *.tsbuildinfo
 
 # Visual Studio
@@ -33,3 +34,9 @@ CLAUDE.local.md
 # OS cruft
 .DS_Store
 Thumbs.db
+
+# PR checks (local runs of CI scripts)
+__pycache__/
+cov-raw/
+cov-sum/
+maintainability-report.json
