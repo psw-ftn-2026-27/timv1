@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Podešavanja za merenje pokrivenosti (Coverlet, collector "XPlat Code Coverage").
+  Izuzima kod koji se NE testira namerno, da ne obara/naduvava brojke — SVE po putanji/tipu,
+  bez ručnih anotacija u kodu:
+    - Migracije, Program.cs (startup), generisani kod (*.Designer.cs)
+    - DTO klase (obično bez logike)
+  SkipAutoProps=true -> auto-property-ji se ne broje kao pokrivive linije.
+
+  Koristi se sa:  dotnet test (settings=coverage.runsettings, collect "XPlat Code Coverage")
+-->
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <SkipAutoProps>true</SkipAutoProps>
+          <!--
+            NE dodavati CompilerGeneratedAttribute. Kompajler telo svake async metode
+            premesta u generisanu state-machine klasu sa tim atributom, pa bi izuzimanje
+            po njemu izbacilo iz merenja tela svih async metoda, lambdi i iteratora.
+          -->
+          <ExcludeByAttribute>GeneratedCodeAttribute</ExcludeByAttribute>
+          <ExcludeByFile>**/Migrations/**/*.cs,**/*.Designer.cs,**/Program.cs</ExcludeByFile>
+          <Exclude>[*]*.Migrations.*,[*]*Dto,[*]*Dtos.*</Exclude>
+          <IncludeTestAssembly>false</IncludeTestAssembly>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

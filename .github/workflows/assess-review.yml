@@ -1,0 +1,64 @@
+name: assess-review
+
+# Procena revizije: kad recenzent preda reviziju, izmereni problemi (lakoća održavanja i pokrivenost
+# iz workflow-a maintainability i coverage) upare se sa komentarima svakog recenzenta posebno.
+# Rezultat: komentar na PRu (uočeno / promašeno) i artefakt "review-assessment" za TeamTracker.
+# Ako merenja ili LLM ne uspeju, ne objavljuje se lažna procena, nego poruka da procena nije izvršena.
+# Treba: ANTHROPIC_API_KEY (secret), opciono ANTHROPIC_MODEL (variable).
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  contents: read
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: assess-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+env:
+  SCRIPTS: _ci/.github/scripts
+
+jobs:
+  assess:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    if: >-
+      github.event.pull_request.base.ref != 'main'
+      && github.event.review.user.login != github.event.pull_request.user.login
+      && github.event.review.user.type != 'Bot'
+    steps:
+      - name: Checkout CI scripts
+        uses: actions/checkout@v4
+        with:
+          path: _ci
+          sparse-checkout: /.github/
+          sparse-checkout-cone-mode: false
+
+      - name: Assess review
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          REVIEW_BODY: ${{ github.event.review.body }}
+          REVIEW_ID: ${{ github.event.review.id }}
+          REVIEW_AUTHOR: ${{ github.event.review.user.login }}
+          WORKFLOW_SHA: ${{ github.workflow_sha }}
+          RUN_ID: ${{ github.run_id }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          LLM_MODEL: ${{ vars.ANTHROPIC_MODEL }}
+          FRONTEND_DIR: ${{ vars.FRONTEND_DIR }}
+        run: bash "$SCRIPTS/assess-review/assess.sh"
+
+      - name: Upload review-assessment
+        uses: actions/upload-artifact@v4
+        with:
+          name: review-assessment
+          path: review-assessment.json
+          if-no-files-found: error

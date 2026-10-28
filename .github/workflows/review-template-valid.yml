@@ -1,0 +1,49 @@
+name: review-template-valid
+
+# Tvrda kapija procesa revizije: spajanje je dozvoljeno tek kad bar jedan recenzent (ne autor, ne bot)
+# popuni review_template.md za sva tri aspekta kvaliteta i zaključak.
+# Rezultat je commit status "review-template": pending (čeka reviziju), failure (detalji u komentaru), success.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches-ignore: [main]
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+
+permissions:
+  contents: read
+  pull-requests: write
+  statuses: write
+
+concurrency:
+  group: review-template-valid-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+env:
+  SCRIPTS: _ci/.github/scripts
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    if: github.event.pull_request.base.ref != 'main'
+    steps:
+      - name: Checkout CI scripts
+        uses: actions/checkout@v4
+        with:
+          path: _ci
+          sparse-checkout: /.github/
+          sparse-checkout-cone-mode: false
+
+      - name: Validate reviews
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EVENT_REVIEW: ${{ toJSON(github.event.review) }}
+        run: bash "$SCRIPTS/review-template/validate.sh"
