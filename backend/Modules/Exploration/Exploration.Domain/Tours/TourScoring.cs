@@ -4,7 +4,7 @@ public static class TourScoring
 {
     public static int Score(int distanceKm, int durationHours, int keyPoints, int reviews, bool hasGuide, bool isNight, bool isWinter)
     {
-        var score = 0
+        var score = 0;
 
         if (distanceKm > 20)
             score += 3;
