@@ -30,7 +30,7 @@ Obeleži tačno jedan tip. Tip opisuje svrhu celog PRa, i za backend i za fronte
 
 🎯 **Change goal** (obavezno uvek, i za backend i za frontend)
 
-TODO: Nalepi tekst korisničke priče koji uključuje acceptance criteria. Ako korisnička priča ne postoji (npr. bugfix, refactor, chore), opiši cilj izmene i po čemu se vidi da je postignut.
+TODO: Ako PR razvija funkcionalnost, navedi njenu karticu (npr. #12) i nalepi ceo tekst kartice. Ako PR nije vezan za karticu funkcionalnosti (npr. bugfix, refactor, chore), opiši cilj izmene i po čemu se vidi da je postignut.
 
 <hr>
 

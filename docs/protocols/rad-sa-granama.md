@@ -80,7 +80,7 @@ Revizija ima dva cilja. Kratkoročno, da kod koji ulazi u `development` ispunjav
 2. Prvo je bitno razumeti izmenu. Pročitajte opis PR-a i komentar „Stanje PR-a”, uključujući njegov odeljak „Za recenzenta”. Ako vam nije jasno šta izmena treba da uradi, pitajte autora pre nego što komentarišete.
 3. Pregledajte izmenu po tri aspekta kvaliteta softvera, sledećim redom:
 
-   - **Funkcionalna pogodnost (ispunjenost zahteva):** da li se rešenje ponaša onako kako je korisnička priča opisala. Ovo se ne može izmeriti i procenjujete isključivo vi, zato prođite korake iz sekcije Testiranje funkcionalnosti u opisu PR-a.
+   - **Funkcionalna pogodnost (ispunjenost zahteva):** da li se rešenje ponaša onako kako je opisano u sekciji Change goal opisa PR-a. Ovo se ne može izmeriti i procenjujete isključivo vi, zato prođite korake iz sekcije Testiranje funkcionalnosti u opisu PR-a.
    
    - **Besprekornost:** da li softver radi ispravno i da li je nov kod pokriven testovima. Pokrivenost novog koda meri analizator; ako je ispod 80%, predložite koje slučajeve još treba pokriti. Smislenost testova procenjujete vi: dobar test za konkretan ulaz proverava očekivani izlaz i pokriva granične slučajeve (nula, prazan skup, prekoračenje), dok test koji samo pozove metodu i proveri da nije bacila izuzetak podiže pokrivenost, a ne tvrdi ništa.
    
