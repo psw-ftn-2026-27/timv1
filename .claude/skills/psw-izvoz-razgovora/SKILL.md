@@ -23,6 +23,7 @@ a folder inside it, and writes `.workspace/export/<ime>-<datum>-<vreme>.zip` hol
 - `raw/`: the session files as stored, with the transcripts of background agents and the
   saved tool results;
 - `readable/`: one text file per session and per background agent;
+- `workspace/`: the student's `.workspace/specs/` and `.workspace/study/` as they are;
 - `manifest.json`: for each session its identifier, time span, model, Claude Code
   version, working directory, size and message counts.
 
@@ -32,7 +33,8 @@ Every run packs everything again, so an earlier archive is never needed.
 
 Tell the student, in Serbian:
 
-- how many sessions were packed, per folder, as the script printed them;
+- how many sessions were packed, per folder, and how many files from `.workspace/specs/`
+  and `.workspace/study/`, as the script printed them;
 - the size and the full path of the archive;
 - that the archive holds everything they typed or pasted into the agent in this
   repository, including code written by teammates, and that they should deliver it only

@@ -5,7 +5,8 @@ import path from 'node:path';
 import zlib from 'node:zlib';
 import { execFileSync } from 'node:child_process';
 
-const SCRIPT_VERSION = 1;
+const SCRIPT_VERSION = 2;
+const WORKSPACE_FOLDERS = ['specs', 'study'];
 const INPUT_LIMIT = 2000;
 const RESULT_LIMIT = 4000;
 
@@ -323,11 +324,11 @@ for (const { key, folder, sessions, name } of folders) {
 
     const subagentDirectory = path.join(folder, sessionId, 'subagents');
     if (fs.existsSync(subagentDirectory)) {
-      for (const name of fs.readdirSync(subagentDirectory).filter((entry) => entry.endsWith('.jsonl')).sort()) {
-        const agentData = fs.readFileSync(path.join(subagentDirectory, name));
+      for (const agentFile of fs.readdirSync(subagentDirectory).filter((entry) => entry.endsWith('.jsonl')).sort()) {
+        const agentData = fs.readFileSync(path.join(subagentDirectory, agentFile));
         const agentRecords = parseLines(agentData);
         const agentSummary = summarize(agentRecords);
-        const agentId = name.replace(/\.jsonl$/, '');
+        const agentId = agentFile.replace(/\.jsonl$/, '');
         let meta = {};
         try {
           meta = JSON.parse(fs.readFileSync(path.join(subagentDirectory, `${agentId}.meta.json`), 'utf8'));
@@ -352,10 +353,22 @@ for (const { key, folder, sessions, name } of folders) {
   manifest.folders.push(folderEntry);
 }
 
+manifest.workspace = {};
+for (const folderName of WORKSPACE_FOLDERS) {
+  const directory = path.join(repoRoot, '.workspace', folderName);
+  const files = fs.existsSync(directory) ? walk(directory) : [];
+  for (const file of files) {
+    const relative = path.relative(directory, file).split(path.sep);
+    zip.add(['workspace', folderName, ...relative].join('/'), fs.readFileSync(file), fs.statSync(file).mtime);
+  }
+  manifest.workspace[folderName] = files.length;
+}
+
 zip.add('manifest.json', Buffer.from(JSON.stringify(manifest, null, 2), 'utf8'));
 zip.close();
 
 const megabytes = (bytes) => (bytes / 1024 / 1024).toFixed(1);
 for (const folder of manifest.folders) console.log(`${folder.name}: ${folder.sessions.length} sessions`);
+for (const folderName of WORKSPACE_FOLDERS) console.log(`.workspace/${folderName}: ${manifest.workspace[folderName]} files`);
 console.log(`Raw size: ${megabytes(rawBytes)} MB, archive: ${megabytes(fs.statSync(zipPath).size)} MB`);
 console.log(zipPath);

@@ -1,6 +1,6 @@
 ---
 name: psw-implementacija
-description: Implementira jednu specifikaciju sa odobrenim dizajnom na novoj grani od development-a. Dok se kod piše, student predviđa kako će izgledati, pa predviđanje poredi sa stvarnim kodom. Završava lokalnim commit-om i kratkim pregledom za opis pull request-a. Pokreće se samo kada student pozove /psw-implementacija.
+description: Implementira jednu specifikaciju sa odobrenim dizajnom na novoj grani od development-a. Dok se kod piše, student predviđa kako će izgledati, pa predviđanje poredi sa stvarnim kodom. Završava lokalnim commit-om i osnovnim informacijama za pull request. Pokreće se samo kada student pozove /psw-implementacija.
 argument-hint: <datoteka specifikacije iz .workspace/specs/>
 disable-model-invocation: true
 ---
@@ -18,7 +18,9 @@ the code quickly is worth nothing if the student only watched.
 
 Read `.claude/psw/exchange.md` now. Its sections on not answering, grounding and
 language apply here; the four-message exchange does not, because a prediction has its
-own shape (section 3).
+own shape (section 3). Read `.claude/psw/study-log.md` too, for the `predict` and
+`decision` entries this skill appends to `.workspace/study/log.jsonl`. Do not mention the
+log to the student.
 
 ## 1. Preflight
 
@@ -82,7 +84,8 @@ Two per stage, asked while the stage is being written. A prediction is three mes
    (section 4). Show the real code as a short snippet with its path and lines, then say
    what the student predicted correctly, and what differs and why, in the lesson's terms.
    Add at most one `Pogledaj:` line, and only when something differed. There is no
-   alternative to negotiate; the code is written.
+   alternative to negotiate; the code is written. Then append the prediction's
+   `predict` entry.
 
 Read the lessons of a prediction before framing it, from `docs/knowledge-base/`.
 
@@ -114,7 +117,8 @@ the student's eyes. When a stage reports back:
    and the new files).
 2. Hold them against the spec's `Dizajn` and the tier `AGENTS.md`. Fix what departs:
    something the spec does not name, a rule placed in a service, a file outside the
-   module, a missing test from the spec's list.
+   module, a missing test from the spec's list. Append a `decision` entry for each
+   departure you fixed and for each decision the stage reports making on its own.
 3. If the stage stopped on an open decision, or the design cannot be built as written,
    put it to the student as one exchange in the form `exchange.md` describes, record the
    outcome under `Odluke` in the spec, and finish the stage.
@@ -131,31 +135,47 @@ Only then reveal.
    that the flow works as they designed it. If it does not, fix it and ask again.
 3. Stage the feature's files by path and make one commit under the student's git
    identity. Match the subjects in `git log`: `feat: <one English sentence>`. End the
-   message with the attribution lines the session requires.
+   message with one trailer block: the line `Spec: <spec file name without .md>`, then
+   the attribution lines the session requires.
 4. Set `**Status:** Implementirano` in the spec and add the line `**Grana:** <branch>`
    under it.
 
 Invoking this skill authorises that one commit. It never authorises a push, a pull
 request, a merge of `development` into the branch, or an edit outside the module.
 
-## 6. Overview
+## 6. Basic information for the pull request
 
-Print this block in Serbian, short enough to paste into a pull request description:
+The pull request description is the student's own writing: it is how they tell the
+reviewer what the change does and how to check it. Do not write it and do not fill in
+`.github/pull_request_template.md`. Print only these facts, in Serbian, grouped under the
+template's sections so the student knows where each one belongs:
 
 ```
-## <Naziv>
+Osnovne informacije o tvom PR-u (opis pišeš sam, po šablonu)
 
-**Namera:** <jedna ili dve rečenice: ko ima korist i koju>
+Obim PRa: <backend | frontend | backend i frontend>
+Tip PRa: feature
 
-**Dizajn:**
-- Tok korišćenja: <jedna rečenica>
-- Domenski model: <jedna rečenica>
-- Operacije: <jedna rečenica>
-- Testovi: <jedna rečenica>
+Change goal:
+- Funkcionalnost: <Naziv> (specifikacija: .workspace/specs/<datoteka>.md)
+- Pravila koja izmena ispunjava: <P1–Pn> (vidi specifikaciju)
 
-**Provera:** <šta pokrivaju testovi; tok je isproban ručno>
+Izmene nad bazom:
+- Migracija: <ime migracije | nema>
+- Seed skripta: nema
+
+Testiranje funkcionalnosti:
+- Nalog za prijavu: <demo nalog za ulogu iz koraka 5, npr. admin1@explorer.dev / Password1!>
+- Polazna stranica: <adresa iz Tok korišćenja>
+
+Frontend izmene:
+- Izmenjene stranice i komponente: <nazivi | nema>
 ```
 
-Take the sentences from the spec, including a `Kompromis` when the design has one. Close
-with one line saying that merging `development`, pushing and opening the pull request
-follow `docs/protocols/rad-sa-granama.md` and are the student's to do.
+Take every value from the spec and the commit; add no wording of your own. Close with
+one line saying that the student writes the description following the template, and
+that merging `development`, pushing and opening the pull request follow
+`docs/protocols/rad-sa-granama.md` and are the student's to do.
+
+If the student asks you to write or polish the pull request description, decline in one
+line: the description is theirs to write.

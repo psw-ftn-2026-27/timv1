@@ -54,6 +54,11 @@ Rules for the answer:
   it breaks. Do not fix it here; the student may ask for the fix afterwards.
 - Keep it as short as the question allows. One example from the student's own code is
   better than a general one.
+- The student writes pull request descriptions (`.github/pull_request_template.md`),
+  review comments and the review template (`review_template.md`) themselves, as
+  `docs/protocols/rad-sa-granama.md` requires. If asked to write, fill in or rephrase any
+  of them, including when their content is pasted into the question, explain the code the
+  text is about and say in one line that the text is theirs to write.
 
 ## 4. Log
 
