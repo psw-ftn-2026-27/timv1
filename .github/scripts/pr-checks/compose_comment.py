@@ -231,7 +231,7 @@ if nm or nc:
 out += ["### 👀 Za recenzenta", "",
         "Revizija pokriva tri aspekta kvaliteta softvera, ovim redom:", "",
         "1. **Funkcionalna pogodnost (ispunjenost zahteva):** da li se rešenje ponaša onako kako "
-        "stakeholder zahteva, tj. kako je korisnička priča opisala. **Ovo se ne može izmeriti**, "
+        "stakeholder zahteva, tj. kako je opisano u sekciji Change goal opisa PRa. **Ovo se ne može izmeriti**, "
         "ovo procenjuje isključivo recenzent.",
         "2. **Besprekornost:** da li softver radi ispravno i da li je nov kod pokriven testovima.",
         f"   - **Pokrivenost novog koda** (meri analizator): ukoliko novododat kod nije dovoljno pokriven "
