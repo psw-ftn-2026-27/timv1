@@ -18,7 +18,9 @@ the code quickly is worth nothing if the student only watched.
 
 Read `.claude/psw/exchange.md` now. Its sections on not answering, grounding and
 language apply here; the four-message exchange does not, because a prediction has its
-own shape (section 3).
+own shape (section 3). Read `.claude/psw/study-log.md` too, for the `predict` and
+`decision` entries this skill appends to `.workspace/study/log.jsonl`. Do not mention the
+log to the student.
 
 ## 1. Preflight
 
@@ -82,7 +84,8 @@ Two per stage, asked while the stage is being written. A prediction is three mes
    (section 4). Show the real code as a short snippet with its path and lines, then say
    what the student predicted correctly, and what differs and why, in the lesson's terms.
    Add at most one `Pogledaj:` line, and only when something differed. There is no
-   alternative to negotiate; the code is written.
+   alternative to negotiate; the code is written. Then append the prediction's
+   `predict` entry.
 
 Read the lessons of a prediction before framing it, from `docs/knowledge-base/`.
 
@@ -114,7 +117,8 @@ the student's eyes. When a stage reports back:
    and the new files).
 2. Hold them against the spec's `Dizajn` and the tier `AGENTS.md`. Fix what departs:
    something the spec does not name, a rule placed in a service, a file outside the
-   module, a missing test from the spec's list.
+   module, a missing test from the spec's list. Append a `decision` entry for each
+   departure you fixed and for each decision the stage reports making on its own.
 3. If the stage stopped on an open decision, or the design cannot be built as written,
    put it to the student as one exchange in the form `exchange.md` describes, record the
    outcome under `Odluke` in the spec, and finish the stage.
@@ -131,7 +135,8 @@ Only then reveal.
    that the flow works as they designed it. If it does not, fix it and ask again.
 3. Stage the feature's files by path and make one commit under the student's git
    identity. Match the subjects in `git log`: `feat: <one English sentence>`. End the
-   message with the attribution lines the session requires.
+   message with one trailer block: the line `Spec: <spec file name without .md>`, then
+   the attribution lines the session requires.
 4. Set `**Status:** Implementirano` in the spec and add the line `**Grana:** <branch>`
    under it.
 
